@@ -29,20 +29,18 @@ def usage():
 	print("SHIFT CYPHER by [@AleDiBen]\n")
 	print("Usage: ./shift.py [OPTIONS] string\n")
 	print("OPTIONS:")
-	print("\t-a\t alphabet code\t\tDefault 0 - See the table below.")
+	print("\t-a\t alphabet code\t\tDefault 0 - See the table below."
 	print("\t-d\t decode a string")
 	print("\t-e\t encode a string")
 	print("\t-h\t show this message")
-	print("\t-s\t shift\t\t\tDefault 3")
-	print()
+	print("\t-s\t shift\t\t\tDefault 3\n")
 	print("ALPHABETS:")
 	print("\t( 0 ) ASCII Printable characters")
 	print("\t( 1 ) Letters form Uppercase to Lowercase: [A-Z][a-z]")
 	print("\t( 2 ) Letters from Lowercase to Uppercase: [a-z][A-Z]")
 	print("\t( 3 ) Alphanumeric: [0-9][A-Z][a-z]")
 	print("\t( 4 ) Letters Uppercase: [A-Z]")
-	print("\t( 5 ) Letters Lowercase: [a-z]")
-	print()
+	print("\t( 5 ) Letters Lowercase: [a-z]\n")
 	print("EXAMPLE:")
 	print("./shift.py -a 1 -s 14 -e 'this is a message'")
 	
@@ -86,7 +84,7 @@ def main(argv):
 		usage()
 		sys.exit(-1)
 		
-	if len(argv) == 0:
+	if len(argv) == 0 :
 		usage()
 		sys.exit(0)
 		
@@ -111,24 +109,18 @@ def main(argv):
 		elif opt in ("-e", "--encode") :
 			mode = ENCODE
 			mssg = arg
-		elif opt in ("-s", "--shift"):
+		elif opt in ("-s", "--shift") :
 			shft = int(arg)
 			
 	# compute the result
 	result = ""
-	if mode == ENCODE:
+	if mode == ENCODE :
 		result = rot(mssg, alph, shft)
-	elif mode == DECODE:
+	elif mode == DECODE :
 		result = invrot(mssg, alph, shft)
 		
 	print(result)
 
 # The main function
-if __name__ == '__main__':
+if __name__ == '__main__' :
 	main(sys.argv[1:])
-	
-
-
-
-
-

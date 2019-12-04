@@ -29,7 +29,7 @@ def usage():
 	print("SHIFT CYPHER by [@AleDiBen]\n")
 	print("Usage: ./shift.py [OPTIONS] string\n")
 	print("OPTIONS:")
-	print("\t-a\t alphabet code\t\tDefault 0 - See the table below."
+	print("\t-a\t alphabet code\t\tDefault 0 - See the table below.")
 	print("\t-d\t decode a string")
 	print("\t-e\t encode a string")
 	print("\t-h\t show this message")

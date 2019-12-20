@@ -12,16 +12,13 @@ import string
 alphabets = [
     "!\"#$%&'()*+,-./" + string.digits + r":;<=>?@" + string.ascii_uppercase +
     r"[\]^_`" + string.ascii_lowercase + r"{|}~",
-    string.printable,
+    string.digits + string.ascii_letters + string.punctuation,
     string.ascii_uppercase,
     string.ascii_lowercase,
     string.ascii_letters,
     string.ascii_uppercase + string.ascii_lowercase,
-    string.digits,
     string.hexdigits,
-    string.octdigits,
-    string.punctuation,
-    string.whitespace
+    string.punctuation
 ]
 
 # Modes
@@ -29,25 +26,18 @@ ENCODE, DECODE = 0, 1
 
 
 def usage():
-    print("BruteForce SHIFT cypher by [@AleDiBen]")
-    print()
-    print("Usage: ./bfshift.py [OPTIONS] string")
-    print()
-    print("OPTIONS:")
-    print(
-        "\t-a\t--alphabet\t alphabet code\t\tDefault 0 - See the table below.")
+    print("BruteForce SHIFT cypher by [@AleDiBen]\n")
+    print("Usage: ./bfshift.py [OPTIONS] string\n")
+    print("  OPTIONS:")
+    print("\t-a\t--alphabet\t alphabet code\t\t\tDefault 0 - See the table below.")
     print("\t-s\t--shift\t\t shift\t\t\t\tDefault 3\n")
     print("\t-d\t--decode\t decode a string")
     print("\t-e\t--encode\t encode a string")
-    print("\t-h\t--help\t\t show this message")
-    print()
-    print("ALPHABETS:")
-    print(
-        "\tNote: if the line breaks, it's because the alphabet includes the \\n character")
-    for index, alphabet in enumerate(alphabets):
-        print(f"\t( {index} ):\t{alphabet}")
-    print()
-    print("EXAMPLE:")
+    print("\t-h\t--help\t\t show this message\n")
+    print("  ALPHABETS:")
+    for index in range(len(alphabets)):
+        print(f"\t( {index} ):\t{alphabets[index]}")
+    print("\nEXAMPLE:")
     print("\t./bfshift.py -a 1 -s 14 -e 'this is a message'")
     print("\t./bfshift.py --alphabet=1 --shift=14 --encode 'this is a message'")
 
@@ -118,7 +108,7 @@ def main(argv):
             except TypeError:
                 print("ERROR: provide a valid shift")
                 exit(-1)
-            if int(arg) > len(alphabets):
+            if index > len(alphabets):
                 print("ERROR: select a valid alphabet")
                 exit(-1)
             alphabet = alphabets[index]
@@ -139,7 +129,6 @@ def main(argv):
         print(rot(message, alphabet, shift))
     elif mode is DECODE:
         print(inv_rot(message, alphabet, shift))
-
 
 if __name__ == '__main__':
     main(argv[1:])

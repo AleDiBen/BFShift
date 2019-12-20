@@ -5,9 +5,9 @@ A super simple BruteForce script for shift ciphers by @AleDiBen & @Omnicrist.
 This Python 3 script to encode/decode arbitrary strings with a shift cipher (i.e. Caesar Cipher, ROT-13, etc.).
 
 ## Features
-[x] Encode/Decode a message
-[ ] Bruteforce option
-[ ] Custom Alphabet
+- [x] Encode/Decode a message
+- [ ] Bruteforce option
+- [ ] Custom Alphabet
 
 ## Supported Alphabets
 0. !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~

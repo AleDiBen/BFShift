@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env python3
 #
 # Author: @AleDiBen
 #         @Omnicrist
@@ -10,7 +10,7 @@ import string
 
 # Alphabets
 alphabets = [
-    "!\\\"#$%&'()*+,-./" + string.digits + r":;<=>?@" + string.ascii_uppercase +
+    "!\"#$%&'()*+,-./" + string.digits + r":;<=>?@" + string.ascii_uppercase +
     r"[\]^_`" + string.ascii_lowercase + r"{|}~",
     string.printable,
     string.ascii_uppercase,

@@ -23,9 +23,7 @@ This Python 3 script to encode/decode arbitrary strings with a shift cipher (i.e
 From 1 to chosen alphabet lenght minus one.
 
 ## Examples
-> Linux Version
-
-Encoding a message:
+> Linux Version: encoding and decoding a message
 ```
 python3 bfshift.py -a 1 -s 14 -e 'this is a message'
 HvwG wG o AsGGous
@@ -34,9 +32,7 @@ python3 bfshift.py -a 1 -s 14 -d 'HvwG wG o AsGGous'
 this is a message
 ```
 
-> Windows Version
-
-Decoding a message:
+> Windows Version: encoding and decoding a message
 ```
 python.exe bfshift.py -a 1 -s 14 -e 'this is a message'
 HvwG wG o AsGGous

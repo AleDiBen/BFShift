@@ -1,6 +1,8 @@
 #!/usr/bin/env
 #
 # Author: @AleDiBen
+#         @Omnicrist
+#
 
 from getopt import getopt, GetoptError
 from sys import exit, argv

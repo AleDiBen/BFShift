@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# ----- BFShift.py -----
 #
 # Author: @AleDiBen
 #         @Omnicrist
@@ -95,7 +95,7 @@ def main(argv):
     # Parse command line arguments
     try:
         inputs = ["alphabet=", "shift=", "decode=", "encode="]
-        opts, args = getopt(argv, "ha:d:e:s", inputs)
+        opts, args = getopt(argv, "ha:d:e:s:", inputs)
     except GetoptError:
         usage()
         exit(-1)

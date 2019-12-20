@@ -45,8 +45,8 @@ def usage():
 def position(ch, alphabet):
     try:
         return alphabet.index(ch)
-    except IndexError:
-        return -1
+    except (IndexError, ValueError) as ex:
+        return ch
 
 
 def rot(string, alphabet, shift):

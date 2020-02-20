@@ -1,2 +1,2 @@
 # BFShift
-A super simple shift cipher
+A super simple shift cipher breaker

@@ -29,7 +29,9 @@ def logger(function):
                 if len(arg_value) < 2 * LOG_SIZE:
                     params.append(arg_name + ":" + arg_value)
                 else:
-                    params.append(arg_name + ":" + arg_value[:LOG_SIZE] + "  . . .  " + arg_value[-LOG_SIZE:])
+                    params.append(arg_name + ":" + arg_value[
+                                                   :LOG_SIZE] + "  . . .  " + arg_value[
+                                                                              -LOG_SIZE:])
             else:
                 params.append(arg_name + ":" + str(arg_value))
 
@@ -38,10 +40,12 @@ def logger(function):
         print("LOGGER:\t" + func_signature)
         ret_value = function(*args, **kwargs)
 
-        print("LOGGER:\t" + function.__name__ + "{}".format(" returned " + (ret_value if ret_value is not None else "None")))
+        print("LOGGER:\t" + function.__name__ + "{}".format(
+            " returned " + (ret_value if ret_value is not None else "None")))
         return ret_value
 
     return wrapper
+
 
 @logger
 def rot(message, alphabet, shift):
@@ -49,23 +53,26 @@ def rot(message, alphabet, shift):
 
     for char in message:
         if char in alphabet:
-            pre_shift = alphabet.index(char)
-            post_shift = pre_shift + shift
-            alph_length = len(alphabet)
-            moduled = post_shift % alph_length
-            shifted_char = alphabet[(alphabet.index(char) + shift) % len(alphabet)]
+            # pre_shift = alphabet.index(char)
+            # post_shift = pre_shift + shift
+            # alph_length = len(alphabet)
+            # moduled = post_shift % alph_length
+            # shifted_char = alphabet[
+            #     (alphabet.index(char) + shift) % len(alphabet)]
             shifted += alphabet[(alphabet.index(char) + shift) % len(alphabet)]
 
-            print("char: {}    PREshift: {}    POSTshift: {}    alph-length: {}    moduled: {}    shifted: {}".format(char, pre_shift, post_shift, alph_length, moduled, shifted_char))
+            # print(
+            #     "char: {}    PREshift: {}    POSTshift: {}    alph-length: {}    moduled: {}    shifted: {}".format(
+            #         char, pre_shift, post_shift, alph_length, moduled,
+            #         shifted_char))
         else:
             shifted += char
-            print("char: {}\t\t\t\t\t\t\t\t\t    shifted: {}".format(char, "NOT IN ALPHABET, NOT PROCESSED"))
-
+            # print("char: {}\t\t\t\t\t\t\t\t\t    shifted: {}".format(char,
+            #                                                          "NOT IN ALPHABET, NOT PROCESSED"))
 
     return shifted
 
 
-@logger
 def inv_rot(message, alphabet, shift):
     return rot(message, alphabet, -shift)
 
@@ -75,10 +82,12 @@ def usage():
     for index, alph in enumerate(alphabets):
         print("\t" + str(index) + "\t" + alph)
 
+
 LOG_SIZE = 40
 ENCODE = 0
 DECODE = 1
 BRUTEFORCE_ALPHABET = 2
+BRUTEFORCE_SHIFT = 3
 
 
 def main(argv):
@@ -96,7 +105,9 @@ def main(argv):
 
     # Parse command line arguments
     try:
-        inputs = ["alphabet=", "shift=", "decode=", "encode=", "custom-alphabet=", "bruteforce-alphabet="]
+        inputs = ["alphabet=", "shift=", "decode=", "encode=",
+                  "custom-alphabet=", "bruteforce-alphabet=",
+                  "bruteforce-shift="]
         opts, args = getopt(argv, "ha:d:e:s:c:", inputs)
     except GetoptError:
         usage()
@@ -105,15 +116,28 @@ def main(argv):
     # Check mutual exclusion between decode and encode options
     optnames = [opt[0] for opt in opts]
     if optnames in ("-d", "--decode") and optnames in ("-e", "--encode"):
-        print("ERROR: Options -d --decode and -e --encode are mutually exclusive")
+        print(
+            "ERROR: Options -d --decode and -e --encode are mutually exclusive")
         exit(-1)
 
-    if optnames in ("-c", "--custom-alphabet") and optnames in ("-a", "--alphabet"):
-        print("ERROR: Options -c --custom-alphabet and -a --alphabet are mutually exclusive")
+    if optnames in ("-c", "--custom-alphabet") and optnames in (
+            "-a", "--alphabet"):
+        print(
+            "ERROR: Options -c --custom-alphabet and -a --alphabet are mutually exclusive")
         exit(-1)
 
-    if optnames in ("--bruteforce-alphabet", ) and optnames in ("-c", "--custom-alphabet", "-a", "--alphabet", "-d", "--decode", "-e", "--encode"):
-        print("ERROR: Options --bruteforce-alphabet and -c --custom-alphabet -a --alphabet -d --decode -e --encode are mutually exclusive")
+    if optnames in ("--bruteforce-alphabet",) and optnames in (
+            "-c", "--custom-alphabet", "-a", "--alphabet", "-d", "--decode",
+            "-e",
+            "--encode"):
+        print(
+            "ERROR: Options --bruteforce-alphabet and -c --custom-alphabet -a --alphabet -d --decode -e --encode are mutually exclusive")
+        exit(-1)
+
+    if optnames in ("--bruteforce-shift",) and optnames in (
+            "-d", "--decode", "-e", "--encode", "-s", "--shift"):
+        print(
+            "ERROR: Options --bruteforce-shift and -d --decode -e --encode -s --shift are mutually exclusive")
         exit(-1)
 
     # Process command line arguments
@@ -136,8 +160,11 @@ def main(argv):
                 print("ERROR: provide at least a 3 chars alphabet")
                 exit(-1)
             alphabet = arg
-        elif opt in ("--bruteforce-alphabet", ):
+        elif opt in ("--bruteforce-alphabet",):
             mode = BRUTEFORCE_ALPHABET
+            message = arg
+        elif opt in ("--bruteforce-shift",):
+            mode = BRUTEFORCE_SHIFT
             message = arg
         elif opt in ("-d", "--decode"):
             mode = DECODE
@@ -159,6 +186,9 @@ def main(argv):
     elif mode is BRUTEFORCE_ALPHABET:
         for alph in alphabets:
             print(inv_rot(message, alph, shift))
+    elif mode is BRUTEFORCE_SHIFT:
+        for index in range(len(alphabet)):
+            print(inv_rot(message, alphabet, index))
 
 
 if __name__ == '__main__':

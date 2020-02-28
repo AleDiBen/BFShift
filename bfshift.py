@@ -35,9 +35,7 @@ def logger(function):
                 if len(arg_value) < 2 * LOG_SIZE:
                     params.append(arg_name + ":" + arg_value)
                 else:
-                    params.append(arg_name + ":" + arg_value[
-                                                   :LOG_SIZE] + "  . . .  " + arg_value[
-                                                                              -LOG_SIZE:])
+                    params.append(arg_name + ":" + arg_value[:LOG_SIZE] + "  . . .  " + arg_value[-LOG_SIZE:])
             else:
                 params.append(arg_name + ":" + str(arg_value))
 
@@ -73,8 +71,7 @@ def rot(message, alphabet, shift):
             #         shifted_char))
         else:
             shifted += char
-            # print("char: {}\t\t\t\t\t\t\t\t\t    shifted: {}".format(char,
-            #                                                          "NOT IN ALPHABET, NOT PROCESSED"))
+            # print("char: {}\t\t\t\t\t\t\t\t\t    shifted: {}".format(char, "NOT IN ALPHABET, NOT PROCESSED"))
 
     return shifted
 
@@ -122,28 +119,19 @@ def main(argv):
     # Check mutual exclusion between decode and encode options
     optnames = [opt[0] for opt in opts]
     if optnames in ("-d", "--decode") and optnames in ("-e", "--encode"):
-        print(
-            "ERROR: Options -d --decode and -e --encode are mutually exclusive")
+        print( "ERROR: Options -d --decode and -e --encode are mutually exclusive")
         exit(-1)
 
-    if optnames in ("-c", "--custom-alphabet") and optnames in (
-            "-a", "--alphabet"):
-        print(
-            "ERROR: Options -c --custom-alphabet and -a --alphabet are mutually exclusive")
+    if optnames in ("-c", "--custom-alphabet") and optnames in ("-a", "--alphabet"):
+        print("ERROR: Options -c --custom-alphabet and -a --alphabet are mutually exclusive")
         exit(-1)
 
-    if optnames in ("--bruteforce-alphabet",) and optnames in (
-            "-c", "--custom-alphabet", "-a", "--alphabet", "-d", "--decode",
-            "-e",
-            "--encode"):
-        print(
-            "ERROR: Options --bruteforce-alphabet and -c --custom-alphabet -a --alphabet -d --decode -e --encode are mutually exclusive")
+    if optnames in ("--bruteforce-alphabet",) and optnames in ("-c", "--custom-alphabet", "-a", "--alphabet", "-d", "--decode", "-e", "--encode"):
+        print("ERROR: Options --bruteforce-alphabet and -c --custom-alphabet -a --alphabet -d --decode -e --encode are mutually exclusive")
         exit(-1)
 
-    if optnames in ("--bruteforce-shift",) and optnames in (
-            "-d", "--decode", "-e", "--encode", "-s", "--shift"):
-        print(
-            "ERROR: Options --bruteforce-shift and -d --decode -e --encode -s --shift are mutually exclusive")
+    if optnames in ("--bruteforce-shift",) and optnames in ("-d", "--decode", "-e", "--encode", "-s", "--shift"):
+        print("ERROR: Options --bruteforce-shift and -d --decode -e --encode -s --shift are mutually exclusive")
         exit(-1)
 
     # Process command line arguments

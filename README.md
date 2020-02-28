@@ -34,9 +34,9 @@ this is a message
 
 > Windows Version (cmd.exe): encoding and decoding a message
 ```
-python.exe bfshift.py -a 1 -s 14 -e "this is a message"
+python.exe bfshift.py -a 1 -s 14 -e -m "this is a message"
 HvwG wG o AsGGous
 
-python.exe bfshift.py -a 1 -s 14 -d "HvwG wG o AsGGous"
+python.exe bfshift.py -a 1 -s 14 -d -m "HvwG wG o AsGGous"
 this is a message
 ```

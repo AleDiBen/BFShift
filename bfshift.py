@@ -100,18 +100,19 @@ def main(argv):
     shift = 3
     mode = ENCODE
     message = ""
+    flag = ""
 
     # Check command line arguments
-    if len(argv) is 0:
+    if len(argv) == 0:
         usage()
         exit(0)
 
     # Parse command line arguments
     try:
-        inputs = ["alphabet=", "shift=", "decode=", "encode=",
-                  "custom-alphabet=", "bruteforce-alphabet=",
-                  "bruteforce-shift="]
-        opts, args = getopt(argv, "ha:d:e:s:c:", inputs)
+        inputs = ["alphabet=", "shift=", "decode", "encode", "message=",
+                  "custom-alphabet=", "bruteforce-alphabet",
+                  "bruteforce-shift", "flag-format="]
+        opts, args = getopt(argv, "ha:d:e:m:s:c:", inputs)
     except GetoptError:
         usage()
         exit(-1)
@@ -134,6 +135,10 @@ def main(argv):
         print("ERROR: Options --bruteforce-shift and -d --decode -e --encode -s --shift are mutually exclusive")
         exit(-1)
 
+    if optnames in ("-e", "--encode", "-d", "--decode") and optnames in ("--flag-format",):
+        print("ERROR: Options -e --encode -d --decode and --flag-format are mutually exclusive")
+        exit(-1)
+
     # Process command line arguments
     for opt, arg in opts:
         if opt in ("-h", "--help"):
@@ -154,17 +159,17 @@ def main(argv):
                 print("ERROR: provide at least a 3 chars alphabet")
                 exit(-1)
             alphabet = arg
+        elif opt in ("--flag-format",):
+            flag = arg
         elif opt in ("--bruteforce-alphabet",):
             mode = BRUTEFORCE_ALPHABET
-            message = arg
         elif opt in ("--bruteforce-shift",):
             mode = BRUTEFORCE_SHIFT
-            message = arg
         elif opt in ("-d", "--decode"):
             mode = DECODE
-            message = arg
         elif opt in ("-e", "--encode"):
             mode = ENCODE
+        elif opt in ("-m", "--message"):
             message = arg
         elif opt in ("-s", "--shift"):
             try:
@@ -178,11 +183,29 @@ def main(argv):
     elif mode is DECODE:
         print(inv_rot(message, alphabet, shift))
     elif mode is BRUTEFORCE_ALPHABET:
+        check = False
         for alph in alphabets:
-            print(inv_rot(message, alph, shift))
+            if flag:
+                string = inv_rot(message, alph, shift)
+                if string.__contains__(flag):
+                    check = True
+                    print(string)
+            else:
+                print(inv_rot(message, alph, shift))
+        if not check:
+            print(f"There was no string containing {flag}")
     elif mode is BRUTEFORCE_SHIFT:
+        check = False
         for index in range(len(alphabet)):
-            print(inv_rot(message, alphabet, index))
+            if flag:
+                string = inv_rot(message, alphabet, index)
+                if string.__contains__(flag):
+                    check = True
+                    print(string)
+            else:
+                print(inv_rot(message, alphabet, index))
+        if not check:
+            print(f"There was no string containing {flag}")
 
 
 if __name__ == '__main__':

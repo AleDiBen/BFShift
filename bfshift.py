@@ -10,6 +10,13 @@ import sys
 from getopt import getopt, GetoptError
 from os import path
 
+debug = False
+LOG_SIZE = 40
+ENCODE = 0
+DECODE = 1
+BRUTEFORCE_ALPHABET = 2
+BRUTEFORCE_SHIFT = 3
+
 alphabets = [
     "!\"#$%&'()*+,-./" + string.digits + r":;<=>?@" + string.ascii_uppercase +
     r"[\]^_`" + string.ascii_lowercase + r"{|}~",
@@ -29,25 +36,28 @@ def logger(function):
 
     @wraps(function)
     def wrapper(*args, **kwargs):
-        params = []
-        arg_spec = inspect.getfullargspec(function).args
-        for arg_name, arg_value in zip(arg_spec, args):
-            if type(arg_value) is str:
-                if len(arg_value) < 2 * LOG_SIZE:
-                    params.append(arg_name + ":" + arg_value)
+        if debug:
+            params = []
+            arg_spec = inspect.getfullargspec(function).args
+            for arg_name, arg_value in zip(arg_spec, args):
+                if type(arg_value) is str:
+                    if len(arg_value) < 2 * LOG_SIZE:
+                        params.append(arg_name + ":" + arg_value)
+                    else:
+                        params.append(arg_name + ":" + arg_value[:LOG_SIZE] + "  . . .  " + arg_value[-LOG_SIZE:])
                 else:
-                    params.append(arg_name + ":" + arg_value[:LOG_SIZE] + "  . . .  " + arg_value[-LOG_SIZE:])
-            else:
-                params.append(arg_name + ":" + str(arg_value))
+                    params.append(arg_name + ":" + str(arg_value))
 
-        func_signature = function.__name__ + '(' + ', '.join(params) + ')'
+            func_signature = function.__name__ + '(' + ', '.join(params) + ')'
 
-        print("LOGGER:\t" + func_signature)
-        ret_value = function(*args, **kwargs)
+            print("LOGGER:\t" + func_signature)
+            ret_value = function(*args, **kwargs)
 
-        print("LOGGER:\t" + function.__name__ + "{}".format(
-            " returned " + (ret_value if ret_value is not None else "None")))
-        return ret_value
+            print("LOGGER:\t" + function.__name__ + "{}".format(
+                " returned " + (ret_value if ret_value is not None else "None")))
+            return ret_value
+        else:
+            return function(*args, **kwargs)
 
     return wrapper
 
@@ -58,21 +68,20 @@ def rot(message, alphabet, shift):
 
     for char in message:
         if char in alphabet:
-            # pre_shift = alphabet.index(char)
-            # post_shift = pre_shift + shift
-            # alph_length = len(alphabet)
-            # moduled = post_shift % alph_length
-            # shifted_char = alphabet[
-            #     (alphabet.index(char) + shift) % len(alphabet)]
-            shifted += alphabet[(alphabet.index(char) + shift) % len(alphabet)]
+            if debug:
+                pre_shift = alphabet.index(char)
+                post_shift = pre_shift + shift
+                alph_length = len(alphabet)
+                moduled = post_shift % alph_length
+                shifted_char = alphabet[(alphabet.index(char) + shift) % len(alphabet)]
+                print("char: {}    PREshift: {}    POSTshift: {}    alph-length: {}    moduled: {}    shifted: {}"
+                        .format(char, pre_shift, post_shift, alph_length, moduled, shifted_char))
 
-            # print(
-            #     "char: {}    PREshift: {}    POSTshift: {}    alph-length: {}    moduled: {}    shifted: {}".format(
-            #         char, pre_shift, post_shift, alph_length, moduled,
-            #         shifted_char))
+            shifted += alphabet[(alphabet.index(char) + shift) % len(alphabet)]
         else:
             shifted += char
-            # print("char: {}\t\t\t\t\t\t\t\t\t    shifted: {}".format(char, "NOT IN ALPHABET, NOT PROCESSED"))
+            if debug:
+                print("char: {}\t\t\t\t\t\t\t\t\t    shifted: {}".format(char, "NOT IN ALPHABET, NOT PROCESSED"))
 
     return shifted
 
@@ -85,13 +94,6 @@ def usage():
     print("Here is where we should tell you how to use this, TODO")
     for index, alph in enumerate(alphabets):
         print("\t" + str(index) + "\t" + alph)
-
-
-LOG_SIZE = 40
-ENCODE = 0
-DECODE = 1
-BRUTEFORCE_ALPHABET = 2
-BRUTEFORCE_SHIFT = 3
 
 
 def main(argv):
@@ -111,7 +113,7 @@ def main(argv):
     # Parse command line arguments
     try:
         inputs = ["alphabet=", "shift=", "decode", "encode", "message=",
-                  "custom-alphabet=", "bruteforce-alphabet",
+                  "custom-alphabet=", "bruteforce-alphabet", "debug",
                   "bruteforce-shift", "flag-format="]
         opts, args = getopt(argv, "ha:dem:s:c:", inputs)
     except GetoptError:
@@ -167,6 +169,9 @@ def main(argv):
                 alphabet = arg
         elif opt in ("--flag-format",):
             flag = arg
+        elif opt in ("--debug",):
+            global debug
+            debug = True
         elif opt in ("--bruteforce-alphabet",):
             mode = BRUTEFORCE_ALPHABET
         elif opt in ("--bruteforce-shift",):

@@ -109,10 +109,10 @@ def main(argv):
 
     # Parse command line arguments
     try:
-        inputs = ["alphabet=", "shift=", "decode=", "encode=",
-                  "custom-alphabet=", "bruteforce-alphabet=",
-                  "bruteforce-shift="]
-        opts, args = getopt(argv, "ha:d:e:s:c:", inputs)
+        inputs = ["alphabet=", "shift=", "decode", "encode", "message=",
+                  "custom-alphabet=", "bruteforce-alphabet",
+                  "bruteforce-shift"]
+        opts, args = getopt(argv, "ha:d:e:m:s:c:", inputs)
     except GetoptError:
         usage()
         exit(-1)
@@ -164,15 +164,13 @@ def main(argv):
                 alphabet = arg
         elif opt in ("--bruteforce-alphabet",):
             mode = BRUTEFORCE_ALPHABET
-            message = arg
         elif opt in ("--bruteforce-shift",):
             mode = BRUTEFORCE_SHIFT
-            message = arg
         elif opt in ("-d", "--decode"):
             mode = DECODE
-            message = arg
         elif opt in ("-e", "--encode"):
             mode = ENCODE
+        elif opt in ("-m", "--message"):
             message = arg
         elif opt in ("-s", "--shift"):
             try:

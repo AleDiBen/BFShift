@@ -113,7 +113,7 @@ def main(argv):
         inputs = ["alphabet=", "shift=", "decode", "encode", "message=",
                   "custom-alphabet=", "bruteforce-alphabet",
                   "bruteforce-shift", "flag-format="]
-        opts, args = getopt(argv, "ha:d:e:m:s:c:", inputs)
+        opts, args = getopt(argv, "ha:dem:s:c:", inputs)
     except GetoptError:
         usage()
         exit(-1)
@@ -162,7 +162,6 @@ def main(argv):
             if path.isfile(arg):
                 with open(arg, 'r') as f:
                     content = f.read()
-                print(content)
                 alphabet = content
             else:
                 alphabet = arg

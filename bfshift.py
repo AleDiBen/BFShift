@@ -8,6 +8,7 @@
 import string
 import sys
 from getopt import getopt, GetoptError
+from os import path
 
 alphabets = [
     "!\"#$%&'()*+,-./" + string.digits + r":;<=>?@" + string.ascii_uppercase +
@@ -102,7 +103,7 @@ def main(argv):
     message = ""
 
     # Check command line arguments
-    if len(argv) is 0:
+    if len(argv) == 0:
         usage()
         exit(0)
 
@@ -153,7 +154,14 @@ def main(argv):
             if len(arg) < 3:
                 print("ERROR: provide at least a 3 chars alphabet")
                 exit(-1)
-            alphabet = arg
+
+            if path.isfile(arg):
+                with open(arg, 'r') as f:
+                    content = f.read()
+                print(content)
+                alphabet = content
+            else:
+                alphabet = arg
         elif opt in ("--bruteforce-alphabet",):
             mode = BRUTEFORCE_ALPHABET
             message = arg

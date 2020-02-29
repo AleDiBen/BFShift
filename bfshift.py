@@ -6,9 +6,9 @@
 
 # Alphabets
 import string
-import sys
 from getopt import getopt, GetoptError
 from os import path
+from parameters import *
 
 debug = False
 LOG_SIZE = 40
@@ -16,6 +16,7 @@ ENCODE = 0
 DECODE = 1
 BRUTEFORCE_ALPHABET = 2
 BRUTEFORCE_SHIFT = 3
+BRUTEFORCE = 4
 
 alphabets = [
     "!\"#$%&'()*+,-./" + string.digits + r":;<=>?@" + string.ascii_uppercase +
@@ -61,6 +62,21 @@ def logger(function):
 
     return wrapper
 
+@logger
+def check_parameters_list(l : list):
+    if len(l) == 1 and l[0] not in ("-h", "--help", "-m", "--message"):
+        return False
+
+    for i in range(len(l)):
+        for j in range(i+1, len(l)):
+            val = matrix[l[i].value][l[j].value]
+            if val == -2:
+                return val, f"LOGIC ERROR: {l[i]} and {l[j]} should not be used together"
+            if val == -1:
+                return val, f"ERROR: {l[i]} and {l[j]} are the same parameter"
+            if not val:
+                return val, f"ERROR: {l[i]} and {l[j]} are mutually exclusive"
+    return True, ""
 
 @logger
 def rot(message, alphabet, shift):
@@ -89,6 +105,32 @@ def rot(message, alphabet, shift):
 def inv_rot(message, alphabet, shift):
     return rot(message, alphabet, -shift)
 
+def check_input_parameters(opts):
+    opt_list = []
+
+    for opt, _ in opts:
+        if opt in ("-h", "--help"):
+            opt_list.append(Parameters.HELP)
+        elif opt in ("-a", "--alphabet"):
+            opt_list.append(Parameters.ALPHABET)
+        elif opt in ("--bruteforce-alphabet",):
+            opt_list.append(Parameters.BRUTEFORCE_ALPHABET)
+        elif opt in ("-b", "--bruteforce-all"):
+            opt_list.append(Parameters.BRUTEFORCE_ALL)
+        elif opt in ("--bruteforce-shift",):
+            opt_list.append(Parameters.BRUTEFORCE_SHIFT)
+        elif opt in ("-c", "--custom-alphabet"):
+            opt_list.append(Parameters.CUSTOM_ALPHABET)
+        elif opt in ("-d", "--decode"):
+            opt_list.append(Parameters.DECODE)
+        elif opt in ("--debug",):
+            opt_list.append(Parameters.DEBUG)
+        elif opt in ("-e", "--encode"):
+            opt_list.append(Parameters.ENCODE)
+        elif opt in ("--flag-format",):
+            opt_list.append(Parameters.FLAG_FORMAT)
+
+    return opt_list
 
 def usage():
     print("                                                      ")
@@ -132,15 +174,14 @@ def usage():
         print("  " + str(index) + ")  " + alph)
     print()
 
-
+@logger
 def main(argv):
     # Default parameters
-
-    alphabet = alphabets[0]
-    shift = 3
-    mode = ENCODE
-    message = ""
-    flag = ""
+    alphabet = None
+    message = None
+    shift = None
+    flag = None
+    mode = BRUTEFORCE
 
     # Check command line arguments
     if len(argv) == 0:
@@ -151,33 +192,19 @@ def main(argv):
     try:
         inputs = ["alphabet=", "shift=", "decode", "encode", "message=",
                   "custom-alphabet=", "bruteforce-alphabet", "debug",
-                  "bruteforce-shift", "flag-format="]
-        opts, args = getopt(argv, "ha:dem:s:c:", inputs)
+                  "bruteforce-shift", "flag-format=", "bruteforce-all"]
+        opts, args = getopt(argv, "ha:dem:s:c:b", inputs)
     except GetoptError:
         usage()
         exit(-1)
 
-    # Check mutual exclusion between decode and encode options
-    optnames = [opt[0] for opt in opts]
-    if optnames in ("-d", "--decode") and optnames in ("-e", "--encode"):
-        print( "ERROR: Options -d --decode and -e --encode are mutually exclusive")
+    # Check mutual exclusion between options
+
+    return_value, control = check_parameters_list(check_input_parameters(opts))
+    if return_value <= 0:
+        print(control)
         exit(-1)
 
-    if optnames in ("-c", "--custom-alphabet") and optnames in ("-a", "--alphabet"):
-        print("ERROR: Options -c --custom-alphabet and -a --alphabet are mutually exclusive")
-        exit(-1)
-
-    if optnames in ("--bruteforce-alphabet",) and optnames in ("-c", "--custom-alphabet", "-a", "--alphabet", "-d", "--decode", "-e", "--encode"):
-        print("ERROR: Options --bruteforce-alphabet and -c --custom-alphabet -a --alphabet -d --decode -e --encode are mutually exclusive")
-        exit(-1)
-
-    if optnames in ("--bruteforce-shift",) and optnames in ("-d", "--decode", "-e", "--encode", "-s", "--shift"):
-        print("ERROR: Options --bruteforce-shift and -d --decode -e --encode -s --shift are mutually exclusive")
-        exit(-1)
-
-    if optnames in ("-e", "--encode", "-d", "--decode") and optnames in ("--flag-format",):
-        print("ERROR: Options -e --encode -d --decode and --flag-format are mutually exclusive")
-        exit(-1)
 
     # Process command line arguments
     for opt, arg in opts:
@@ -199,37 +226,29 @@ def main(argv):
                 print("ERROR: provide at least a 3 chars alphabet")
                 exit(-1)
             if path.isfile(arg):
-                with open(arg, 'r') as f:
-                    content = f.read()
+                with open(arg, 'r') as f: content = f.read()
                 alphabet = content
             else:
                 alphabet = arg
-        elif opt in ("--flag-format",):
-            flag = arg
+        elif opt in ("--flag-format",): flag = arg
         elif opt in ("--debug",):
             global debug
             debug = True
-        elif opt in ("--bruteforce-alphabet",):
-            mode = BRUTEFORCE_ALPHABET
-        elif opt in ("--bruteforce-shift",):
-            mode = BRUTEFORCE_SHIFT
-        elif opt in ("-d", "--decode"):
-            mode = DECODE
-        elif opt in ("-e", "--encode"):
-            mode = ENCODE
-        elif opt in ("-m", "--message"):
-            message = arg
+        elif opt in ("--bruteforce-alphabet",): mode = BRUTEFORCE_ALPHABET
+        elif opt in ("--bruteforce-shift",): mode = BRUTEFORCE_SHIFT
+        elif opt in ("-b", "--bruteforce-all"): mode = BRUTEFORCE
+        elif opt in ("-d", "--decode"): mode = DECODE
+        elif opt in ("-e", "--encode"): mode = ENCODE
+        elif opt in ("-m", "--message"): message = arg
         elif opt in ("-s", "--shift"):
-            try:
-                shift = int(arg)
-            except TypeError:
+            try: shift = int(arg)
+            except ValueError:
                 print("ERROR: provide a valid shift")
+                exit(-1)
 
     # Compute the result
-    if mode is ENCODE:
-        print(rot(message, alphabet, shift))
-    elif mode is DECODE:
-        print(inv_rot(message, alphabet, shift))
+    if mode is ENCODE: print(rot(message, alphabet, shift))
+    elif mode is DECODE: print(inv_rot(message, alphabet, shift))
     elif mode is BRUTEFORCE_ALPHABET:
         check = False
         for alph in alphabets:
@@ -254,7 +273,21 @@ def main(argv):
                 print(inv_rot(message, alphabet, index))
         if not check:
             print(f"There was no string containing {flag}")
+    elif mode is BRUTEFORCE:
+        check = False
+        for alph in alphabets:
+            for index in range(len(alph)):
+                if flag:
+                    string = inv_rot(message, alph, index)
+                    if string.__contains__(flag):
+                        check = True
+                        print(string)
+                else:
+                    print(inv_rot(message, alph, shift))
+        if not check:
+            print(f"There was no string containing {flag}")
 
 
 if __name__ == '__main__':
-    main(sys.argv[1:])
+    from sys import argv
+    main(argv[1:])

@@ -1,8 +1,8 @@
 # BFShift
-A super simple BruteForce script for shift ciphers by @AleDiBen & @Omnicrist.
+A super simple bruteforce script for shift ciphers by @AleDiBen & @Omnicrist.
 
 ## Description
-This Python 3 script to encode/decode arbitrary strings with a shift cipher (i.e. Caesar Cipher, ROT-13, etc.).
+This Python 3 script to encode/decode arbitrary strings using a shift cipher (i.e. Caesar Cipher, ROT-13, etc.).
 
 ## Features
 The following features are supported
@@ -45,3 +45,5 @@ HvwG wG o AsGGous
 python.exe bfshift.py -a 1 -s 14 -d -m "HvwG wG o AsGGous"
 this is a message
 ```
+
+*...may the security be with you...*

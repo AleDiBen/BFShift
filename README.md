@@ -6,12 +6,12 @@ This Python 3 script to encode/decode arbitrary strings with a shift cipher (i.e
 
 ## Features
 - [x] Encode/Decode a message
-- [ ] Usage print
+- [x] Usage print
 - [x] Bruteforce option
 - [x] Custom Alphabet
 - [x] Custom Alphabet from file
 - [x] Flag format
-- [ ] Debug Mode
+- [x] Debug Mode
 - [ ] Multi-threading
 
 ## Supported Alphabets

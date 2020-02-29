@@ -6,8 +6,13 @@ This Python 3 script to encode/decode arbitrary strings with a shift cipher (i.e
 
 ## Features
 - [x] Encode/Decode a message
-- [ ] Bruteforce option
-- [ ] Custom Alphabet
+- [ ] Usage print
+- [x] Bruteforce option
+- [x] Custom Alphabet
+- [x] Custom Alphabet from file
+- [x] Flag format
+- [ ] Debug Mode
+- [ ] Multi-threading
 
 ## Supported Alphabets
 0. !"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~

@@ -17,14 +17,14 @@ The following features are supported
 ## Supported Alphabets
 Code | Alphabet
 ----- | ---------
-0 | !"#$%&'()\*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^\_`abcdefghijklmnopqrstuvwxyz{\|}~
-1 | 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&'()\*+,-./:;<=>?@[\\]^\_`{\|}~
+0 | !"#$%&'()\*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^\_\`abcdefghijklmnopqrstuvwxyz{\|}~
+1 | 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&'()\*+,-./:;<=>?@[\\]^\_\`{\|}~
 2 | ABCDEFGHIJKLMNOPQRSTUVWXYZ
 3 | abcdefghijklmnopqrstuvwxyz
 4 | abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
 5 | ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
 6 | 0123456789abcdefABCDEF
-7 | !"#$%&'()\*+,-./:;<=>?@[\\]^\_`{\|}~
+7 | !"#$%&'()\*+,-./:;<=>?@[\\]^\_\`{\|}~
 
 ## Supported Shifts
 From 1 to chosen alphabet lenght minus one.

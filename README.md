@@ -31,7 +31,7 @@ From 1 to chosen alphabet lenght minus one.
 > Linux Version: encoding and decoding a message
 ```
 python3 bfshift.py -m this_is_a_message
-\"uv!lv!lnlzr!!ntr
+"uv!lv!lnlzr!!ntr
 
 python3 bfshift.py -d -m '"uv!lv!lnlzr!!ntr'
 this is a message
@@ -54,7 +54,7 @@ hsalab{this_is_a_message}
 > Windows Version (cmd.exe): encoding and decoding a message
 ```
 python.exe bfshift.py -m this_is_a_message
-\"uv!lv!lnlzr!!ntr
+"uv!lv!lnlzr!!ntr
 
 python.exe bfshift.py -a 3 --bf-shift -m "ozhshi{Aopz_pz_h_tlzzhnl}"
 nygrgh{znoy_oy_g_skyygmk}

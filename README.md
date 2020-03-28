@@ -9,7 +9,6 @@ The following features are supported
 - [x] Encode/Decode a message
 - [x] Perform a Bruteforce attack using different alphabets and/or shift amounts
 - [x] Specify your own custom alphabet
-- [x] Load a custom alphabet from a string
 - [x] Specify a flag format in order to filter results
 - [x] Run the script in Debug Mode
 - [ ] Multi-threading

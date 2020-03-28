@@ -11,7 +11,7 @@ The following features are supported
 - [x] Specify your own custom alphabet
 - [x] Specify a flag format in order to filter results
 - [x] Run the script in Debug Mode
-- [ ] Multi-threading
+- [ ] Multi-threading? May be useless
 
 ## Supported Alphabets
 Code | Alphabet

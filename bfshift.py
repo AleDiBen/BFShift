@@ -1,136 +1,39 @@
-# ----- BFShift.py -----
-#
-# Author: @AleDiBen
-#         @Omnicrist
-#
+#!/usr/bin/python3
 
-# Alphabets
 import string
 from getopt import getopt, GetoptError
 from os import path
+from sys import argv
 from parameters import *
 
+# GLOBAL VARIABLES
+alphabet_id = 0
+bf_method = None
+custom_alphabet = None
 debug = False
-LOG_SIZE = 40
-ENCODE = 0
-DECODE = 1
-BRUTEFORCE_ALPHABET = 2
-BRUTEFORCE_SHIFT = 3
-BRUTEFORCE = 4
+flag_format = ""
+message = ""
+mode = Modes.ENCODE
+shift_amount = 13
 
+dgts = string.digits
+uppr = string.ascii_uppercase
+lowr = string.ascii_lowercase
 alphabets = [
-    "!\"#$%&'()*+,-./" + string.digits + r":;<=>?@" + string.ascii_uppercase +
-    r"[\]^_`" + string.ascii_lowercase + r"{|}~",
-    string.digits + string.ascii_letters + string.punctuation,
-    string.ascii_uppercase,
-    string.ascii_lowercase,
-    string.ascii_letters,
-    string.ascii_uppercase + string.ascii_lowercase,
-    string.hexdigits,
-    string.punctuation
+	# All printable ASCII characters from 32 to 126
+	" !\"#$%&\'()*+,-./" + dgts + r":;<=>?@" + uppr + "[\\]^_`" + lowr + "{|}~",
+	# Letters: lower case + upper case
+	string.ascii_letters,
+	# Letters: upper case + lower case
+	uppr + lowr,
+	# Digits + lower case letters + upper case letters
+	dgts + string.ascii_letters,
+	# Only punctuation
+	string.punctuation,
+	# Hex Digits
+	string.hexdigits
 ]
 
-
-def logger(function):
-    from functools import wraps
-    import inspect
-
-    @wraps(function)
-    def wrapper(*args, **kwargs):
-        if debug:
-            params = []
-            arg_spec = inspect.getfullargspec(function).args
-            for arg_name, arg_value in zip(arg_spec, args):
-                if type(arg_value) is str:
-                    if len(arg_value) < 2 * LOG_SIZE:
-                        params.append(arg_name + ":" + arg_value)
-                    else:
-                        params.append(arg_name + ":" + arg_value[:LOG_SIZE] + "  . . .  " + arg_value[-LOG_SIZE:])
-                else:
-                    params.append(arg_name + ":" + str(arg_value))
-
-            func_signature = function.__name__ + '(' + ', '.join(params) + ')'
-
-            print("LOGGER:\t" + func_signature)
-            ret_value = function(*args, **kwargs)
-
-            print("LOGGER:\t" + function.__name__ + "{}".format(
-                " returned " + (ret_value if ret_value is not None else "None")))
-            return ret_value
-        else:
-            return function(*args, **kwargs)
-
-    return wrapper
-
-@logger
-def check_parameters_list(l : list):
-    if len(l) == 1 and l[0] not in ("-h", "--help", "-m", "--message"):
-        return False
-
-    for i in range(len(l)):
-        for j in range(i+1, len(l)):
-            val = matrix[l[i].value][l[j].value]
-            if val == -2:
-                return val, f"LOGIC ERROR: {l[i]} and {l[j]} should not be used together"
-            if val == -1:
-                return val, f"ERROR: {l[i]} and {l[j]} are the same parameter"
-            if not val:
-                return val, f"ERROR: {l[i]} and {l[j]} are mutually exclusive"
-    return True, ""
-
-@logger
-def rot(message, alphabet, shift):
-    shifted = ""
-
-    for char in message:
-        if char in alphabet:
-            if debug:
-                pre_shift = alphabet.index(char)
-                post_shift = pre_shift + shift
-                alph_length = len(alphabet)
-                moduled = post_shift % alph_length
-                shifted_char = alphabet[(alphabet.index(char) + shift) % len(alphabet)]
-                print("char: {}    PREshift: {}    POSTshift: {}    alph-length: {}    moduled: {}    shifted: {}"
-                        .format(char, pre_shift, post_shift, alph_length, moduled, shifted_char))
-
-            shifted += alphabet[(alphabet.index(char) + shift) % len(alphabet)]
-        else:
-            shifted += char
-            if debug:
-                print("char: {}\t\t\t\t\t\t\t\t\t    shifted: {}".format(char, "NOT IN ALPHABET, NOT PROCESSED"))
-
-    return shifted
-
-
-def inv_rot(message, alphabet, shift):
-    return rot(message, alphabet, -shift)
-
-def check_input_parameters(opts):
-    opt_list = []
-
-    for opt, _ in opts:
-        if opt in ("-h", "--help"):
-            opt_list.append(Parameters.HELP)
-        elif opt in ("-a", "--alphabet"):
-            opt_list.append(Parameters.ALPHABET)
-        elif opt in ("--bruteforce-alphabet",):
-            opt_list.append(Parameters.BRUTEFORCE_ALPHABET)
-        elif opt in ("-b", "--bruteforce-all"):
-            opt_list.append(Parameters.BRUTEFORCE_ALL)
-        elif opt in ("--bruteforce-shift",):
-            opt_list.append(Parameters.BRUTEFORCE_SHIFT)
-        elif opt in ("-c", "--custom-alphabet"):
-            opt_list.append(Parameters.CUSTOM_ALPHABET)
-        elif opt in ("-d", "--decode"):
-            opt_list.append(Parameters.DECODE)
-        elif opt in ("--debug",):
-            opt_list.append(Parameters.DEBUG)
-        elif opt in ("-e", "--encode"):
-            opt_list.append(Parameters.ENCODE)
-        elif opt in ("--flag-format",):
-            opt_list.append(Parameters.FLAG_FORMAT)
-
-    return opt_list
 
 def usage():
     print("                                                      ")
@@ -145,149 +48,273 @@ def usage():
     print("                                                      ")
     print(" !A super simple BruteForce script for shift ciphers! ")
     print("                                                      ")
-    print("SYNTAX : python bfshift.py [OPTIONS] -m \"A MESSAGE\" ")
-    print("OPTIONS: ")
+    print("SYNTAX : python bfshift.py [OPTIONS] -m A_STRING_XXX  ")
+    print("\nOPTIONS: ")
     print("  -a --alphabet\t\t\t the alphabet number chosen from the list below")
-    print("  -c --custom-alphabet\t\t specify your own alphabet using a string or a file")
+    print("  -c --custom-alphabet\t\t specify your own alphabet using a string")
     print("  -d --decode\t\t\t decode mode")
     print("  -e --encode\t\t\t encode mode")
     print("  -h --help\t\t\t print the usage")
     print("  -m --message\t\t\t a message to encode/decode")
     print("  -s --shift\t\t\t amount of shift to encode/decode a message")
-    print("     --bruteforce-alphabet\t try to decode using all alphabets")
-    print("     --bruteforce-shift\t\t try to decode using all possible shifts")
+    print("     --bf-all\t\t try to decode using all alphabets and possible shifts")
+    print("     --bf-alphabets\t try to decode using all alphabets")
+    print("     --bf-shift\t\t try to decode using all possible shifts")
     print("     --debug\t\t\t enable logging for debug purposes")
     print("     --flag-format\t\t filter results that contain a specific format")
-    print("EXAMPLES:")
+    print("\nDEFAULT OPTIONS:")
+    print("  alphabet : 0")
+    print("  shift    : 13")
+    print("  mode     : encode")
+    print("\nEXAMPLES:")
     print("  python bfshift.py -m this_is_a_message")
     print("  python bfshift.py -e -m this_is_a_message")
-    print("  python bfshift.py -d -m wklvblvbdbphvvdjh")
+    print("  python bfshift.py -d -m '\"uv!lv!lnlzr!!ntr'")
     print("  python bfshift.py -a 3 -s 7 -m this_is_a_message")
-    print("  python bfshift.py -a 3 -e -s 7 -m \"hsalab{this_is_a_message}\"")
-    print("  python bfshift.py -a 3 -d -s 7 -m \"ozhshi{aopz_pz_h_tlzzhnl}\"")
-    print("  python bfshift.py -a 3 --bruteforce-shift -m \"ozhshi{aopz_pz_h_tlzzhnl}\"")
-    print("  python bfshift.py -a 3 --bruteforce-shift --flag-format \"hsalab{\" -m \"ozhshi{aopz_pz_h_tlzzhnl}\"")
-    print("  python bfshift.py --bruteforce-alphabet -s 7 --flag-format \"hsalab{\" -m \"ozhshi{aopz_pz_h_tlzzhnl}\"")
-    print("\n\n BUILT-IN ALPHABETS")
-    print("--------------------")
+    print("  python bfshift.py -a 3 -e -s 7 -m 'hsalab{this_is_a_message}'")
+    print("  python bfshift.py -a 3 -d -s 7 -m 'ozhshi{Aopz_pz_h_tlzzhnl}'")
+    print("  python bfshift.py -a 3 --bf-shift -m 'ozhshi{Aopz_pz_h_tlzzhnl}'")
+    print("  python bfshift.py -a 3 --bf-shift --flag-format 'hsalab{' -m 'ozhshi{Aopz_pz_h_tlzzhnl}'")
+    print("  python bfshift.py --bf-alphabets -s 7 --flag-format 'hsalab{' -m 'ozhshi{Aopz_pz_h_tlzzhnl}'")
+    print("  python bfshift.py --bf-all --flag-format 'hsalab{' -m 'ozhshi{Aopz_pz_h_tlzzhnl}'")
+    print("\nBUILT-IN ALPHABETS")
+    print("----------------------------------------")
     for index, alph in enumerate(alphabets):
         print("  " + str(index) + ")  " + alph)
-    print()
-
-@logger
-def main(argv):
-    # Default parameters
-    alphabet = None
-    message = None
-    shift = None
-    flag = None
-    mode = BRUTEFORCE
-
-    # Check command line arguments
-    if len(argv) == 0:
-        usage()
-        exit(0)
-
-    # Parse command line arguments
-    try:
-        inputs = ["alphabet=", "shift=", "decode", "encode", "message=",
-                  "custom-alphabet=", "bruteforce-alphabet", "debug",
-                  "bruteforce-shift", "flag-format=", "bruteforce-all"]
-        opts, args = getopt(argv, "ha:dem:s:c:b", inputs)
-    except GetoptError:
-        usage()
-        exit(-1)
-
-    # Check mutual exclusion between options
-
-    return_value, control = check_parameters_list(check_input_parameters(opts))
-    if return_value <= 0:
-        print(control)
-        exit(-1)
+    print("----------------------------------------")
 
 
-    # Process command line arguments
-    for opt, arg in opts:
-        if opt in ("-h", "--help"):
-            usage()
-            exit(0)
-        elif opt in ("-a", "--alphabet"):
-            try:
-                index = int(arg)
-            except TypeError:
-                print("ERROR: provide a valid shift")
-                exit(-1)
-            if index > len(alphabets):
-                print("ERROR: select a valid alphabet")
-                exit(-1)
-            alphabet = alphabets[index]
-        elif opt in ("-c", "--custom-alphabet"):
-            if len(arg) < 3:
-                print("ERROR: provide at least a 3 chars alphabet")
-                exit(-1)
-            if path.isfile(arg):
-                with open(arg, 'r') as f: content = f.read()
-                alphabet = content
-            else:
-                alphabet = arg
-        elif opt in ("--flag-format",): flag = arg
-        elif opt in ("--debug",):
-            global debug
-            debug = True
-        elif opt in ("--bruteforce-alphabet",): mode = BRUTEFORCE_ALPHABET
-        elif opt in ("--bruteforce-shift",): mode = BRUTEFORCE_SHIFT
-        elif opt in ("-b", "--bruteforce-all"): mode = BRUTEFORCE
-        elif opt in ("-d", "--decode"): mode = DECODE
-        elif opt in ("-e", "--encode"): mode = ENCODE
-        elif opt in ("-m", "--message"): message = arg
-        elif opt in ("-s", "--shift"):
-            try: shift = int(arg)
-            except ValueError:
-                print("ERROR: provide a valid shift")
-                exit(-1)
-
-    # Compute the result
-    if mode is ENCODE: print(rot(message, alphabet, shift))
-    elif mode is DECODE: print(inv_rot(message, alphabet, shift))
-    elif mode is BRUTEFORCE_ALPHABET:
-        check = False
-        for alph in alphabets:
-            if flag:
-                string = inv_rot(message, alph, shift)
-                if string.__contains__(flag):
-                    check = True
-                    print(string)
-            else:
-                print(inv_rot(message, alph, shift))
-        if not check:
-            print(f"There was no string containing {flag}")
-    elif mode is BRUTEFORCE_SHIFT:
-        check = False
-        for index in range(len(alphabet)):
-            if flag:
-                string = inv_rot(message, alphabet, index)
-                if string.__contains__(flag):
-                    check = True
-                    print(string)
-            else:
-                print(inv_rot(message, alphabet, index))
-        if not check:
-            print(f"There was no string containing {flag}")
-    elif mode is BRUTEFORCE:
-        check = False
-        for alph in alphabets:
-            for index in range(len(alph)):
-                if flag:
-                    string = inv_rot(message, alph, index)
-                    if string.__contains__(flag):
-                        check = True
-                        print(string)
-                else:
-                    print(inv_rot(message, alph, shift))
-        if not check:
-            print(f"There was no string containing {flag}")
+def printdbg(message, level=DebugMessages.INFO):
+	global debug
+	if debug:
+		if level == DebugMessages.INFO:
+			print("[  INFO  ]", message)
+		elif level == DebugMessages.WARNING:
+			print("[WARNING!]", message)
+		elif level == DebugMessages.ERROR:
+			print("[ ERROR! ]", message)
+		elif level == DebugMessages.FATAL:
+			print("[ FATAL! ]", message)
 
 
-if __name__ == '__main__':
-    from sys import argv
-    main(argv[1:])
+def printerr(message):
+	print("[  ERROR!  ]", message)
+
+# Parse options
+def parse_opts(opts):
+	global alphabet_id
+	global bf_method
+	global custom_alphabet
+	global debug
+	global flag_format
+	global message
+	global mode
+	global shift_amount
+	alphabet_error = False
+	shift_error = False
+	opt_list = []
+
+	for opt, val in opts:
+		if opt in ("-a", "--alphabet"):
+			opt_list.append(Parameters.ALPHABET)
+			try: 
+				alphabet_id = int(val)
+			except ValueError:
+				alphabet_error = True
+		elif opt in ("-b", "--bf-all"):
+			opt_list.append(Parameters.BRUTEFORCE_ALL)
+			bf_method = BruteForceMethod.ALL
+			mode = Modes.DECODE
+		elif opt in ("--bf-alphabets",):
+			opt_list.append(Parameters.BRUTEFORCE_ALPHABET)
+			bf_method = BruteForceMethod.ALPHABET
+			mode = Modes.DECODE
+		elif opt in ("--bf-shift",):
+			opt_list.append(Parameters.BRUTEFORCE_SHIFT)
+			bf_method = BruteForceMethod.SHIFT
+			mode = Modes.DECODE
+		elif opt in ("-c", "--custom-alphabet"):
+			opt_list.append(Parameters.CUSTOM_ALPHABET)
+			last_id = len(alphabets)
+			alphabets.append(str(val))
+			custom_alphabet = str(val)
+			alphabet_id = last_id
+		elif opt in ("-d", "--decode"):
+			opt_list.append(Parameters.DECODE)
+			mode = Modes.DECODE
+		elif opt in ("--debug",):
+			opt_list.append(Parameters.DEBUG)
+			debug = True
+		elif opt in ("-e", "--encode"):
+			opt_list.append(Parameters.ENCODE)
+			mode = Modes.ENCODE
+		elif opt in ("--flag-format",):
+			opt_list.append(Parameters.FLAG_FORMAT)
+			flag_format = str(val)
+		elif opt in ("-h", "--help"):
+			opt_list.append(Parameters.HELP)
+			usage()
+		elif opt in ("-m", "--message"):
+			message = str(val)
+			if message == "":
+				printerr("EMPTY MESSAGE")
+				exit(-1)
+			opt_list.append(Parameters.MESSAGE)
+		elif opt in ("-s", "--shift"):
+			opt_list.append(Parameters.SHIFT)
+			try: 
+				shift_amount = int(val)
+			except ValueError:
+				shift_error = True
+
+	printdbg("------------------------------PARSING THE ARGUMENTS-----------------------------")
+	if alphabet_id > len(alphabets) or alphabet_error:
+		printdbg("Not a valid alphabet index", DebugMessages.WARNING)
+		printdbg("Switching to default alphabet")
+		alphabet_id = 0
+
+	if shift_error:
+		printdbg("Not a valid shift amount", DebugMessages.WARNING)
+		printdbg("Switching to default shift amount", DebugMessages.INFO)
+		shift_amount = 13
+
+	if Parameters.BRUTEFORCE_ALPHABET in opt_list and Parameters.BRUTEFORCE_SHIFT in opt_list:
+		printdbg("Detected --bf-alphabets and --bf-shift options", DebugMessages.WARNING)
+		printdbg("Suggestion: you can simply use --bf-all")
+		printdbg("Switching to BRUTEFORCE_ALL method")
+		bf_method = BruteForceMethod.ALL
+
+	printdbg("PARSING OK")
+	return opt_list
+
+# Check mutex between options, check if an
+# option is repeated two or more times
+def check_opts(l: list):
+
+	if Parameters.HELP in l:
+		return False
+
+	if Parameters.MESSAGE not in l:
+		printerr("Missing message option")
+		return False
+
+	printdbg("\r          ")
+	printdbg("-------------------------------COMPATIBILITY CHECK------------------------------")
+	for i in range(len(l)):
+		for j in range(i + 1, len(l)):
+			code = matrix[l[i].value][l[j].value]
+			iparam_name = f"{l[i]}".replace("Parameters.", "")
+			jparam_name = f"{l[j]}".replace("Parameters.", "")
+			printdbg(f"{iparam_name} compatible with {jparam_name} ?? " + str(code == 0))
+			if code == Errors.SAME_OPT.value:
+				printerr(f"Repeated options {iparam_name}")
+			elif code == Errors.MUTEX.value:
+				printerr(f"The option {iparam_name} is not compatible with the option {jparam_name}")
+			
+			if code < 0:
+				return False
+
+	return True
+
+
+def encode_message(message, alphabet, shift):
+	shifted = ""
+	for char in message:
+		if char in alphabet:
+			shifted += alphabet[(alphabet.index(char) + shift) % len(alphabet)]
+		else:
+			shifted += char
+
+	return shifted
+
+
+def decode_message(message, alphabet, shift):
+    return encode_message(message, alphabet, -shift)
+
+
+def bruteforce(message, alphabets=None, shifts=None):
+	results = ""
+	for a in alphabets:
+		if shifts == None:
+			shifts = range(1, len(a))
+		for s in shifts:
+			results += decode_message(message, a, s) + "\n"
+
+	return results[:-1]
+
+
+# MAIN
+if __name__ == "__main__":
+	arguments = argv[1:]
+
+	if len(arguments) == 0:
+		usage()
+		exit(0)
+
+	try:
+		inputs = ["alphabet=", "bf-all", "bf-alphabets", "bf-shift", "custom-alphabet=", "debug", "decode", "encode", "flag-format=", "help", "message=", "shift="]
+		opts, _ = getopt(arguments, "a:bc:def:hm:s:", inputs)
+	except GetoptError:
+		printerr("Invalid input arguments. Check the usage with option -h.")
+		exit(0)
+
+	# PARSE ARGUMENTS + VALUES CHECKING
+	parsed_opts = parse_opts(opts)
+	
+	# MUTEX CHECK
+	opts_ok = check_opts(parsed_opts)
+
+	if opts_ok:
+		if Parameters.HELP in parsed_opts:
+			usage()
+			exit(0)
+
+		strmode = f"{mode}".replace("Modes.", "")
+		printdbg("\r          ")
+		printdbg("-------------------------------PRE EXECUTION CHECK------------------------------")
+		printdbg("Parsed options  : " + ', '.join(f"{x}".replace("Parameters.", "") for x in parsed_opts))
+		printdbg("Custom alphabet : " + str(custom_alphabet))
+		printdbg("Message         : " + message)
+		printdbg("Mode            : " + strmode)
+		printdbg("\r          ")
+		printdbg("------------------------------------EXECUTION-----------------------------------")
+		
+		result = ""
+		if mode == Modes.ENCODE:
+			printdbg("Using alphabet  : " + str(alphabets[alphabet_id]))
+			printdbg("Using shift     : " + str(shift_amount))
+			result = encode_message(message, alphabets[alphabet_id], shift_amount)
+		elif mode == Modes.DECODE:
+			possible_strings = ""
+			printdbg("BF Method       : " + str(bf_method).replace("BruteForceMethod.", ""))
+			if (bf_method == None):
+				result = decode_message(message, alphabets[alphabet_id], shift_amount)
+			elif bf_method == BruteForceMethod.ALL:
+				printdbg("Using alphabet  : All ("+ str(len(alphabets)) +") alphabets")
+				printdbg("Using shift     : All possible shifts")
+				possible_strings = bruteforce(message, alphabets)
+			elif bf_method == BruteForceMethod.ALPHABET:
+				printdbg("Using alphabet  : All ("+ str(len(alphabets)) +") alphabets")
+				printdbg("Using shift     : All possible shifts")
+				possible_strings = bruteforce(message, alphabets, [shift_amount])
+			elif bf_method == BruteForceMethod.SHIFT:
+				printdbg("Using alphabet  : " + str(alphabets[alphabet_id]))
+				shift_amount = len(alphabets[alphabet_id])
+				printdbg("Using shift     : from 1 to " + str(shift_amount))
+				possible_strings = bruteforce(message, [alphabets[alphabet_id]], range(1, shift_amount))
+
+			if flag_format != "":
+				arr_possible_strings = possible_strings.split("\n")
+				for s in arr_possible_strings:
+					if flag_format in s:
+						result += s + "\n"
+				result = result[:-1]
+			else:
+				result = possible_strings
+
+		printdbg("\r          ")
+		print(result)
+
+	exit(0)
+	
+		

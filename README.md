@@ -17,7 +17,7 @@ The following features are supported
 ## Supported Alphabets
 Code | Alphabet
 ----- | ---------
-0 | \ !"#$%&'()\*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^\_\`abcdefghijklmnopqrstuvwxyz{\|}~
+0 | [SPACE]!"#$%&'()\*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^\_\`abcdefghijklmnopqrstuvwxyz{\|}~
 1 | 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&'()\*+,-./:;<=>?@[\\]^\_\`{\|}~
 2 | ABCDEFGHIJKLMNOPQRSTUVWXYZ
 3 | abcdefghijklmnopqrstuvwxyz

@@ -4,12 +4,12 @@ A super simple encode/decode/bruteforce script for shift ciphers by @AleDiBen & 
 ## Description
 This Python 3 script to encode/decode/bruteforce arbitrary strings using a shift cipher (i.e. Caesar Cipher, ROT-13, etc.).
 
-## Features
+## Features / TO-DO
 The following features are supported
 - [x] Encode/Decode a message
 - [x] Perform a Bruteforce attack using different alphabets and/or shift amounts
 - [x] Specify your own custom alphabet
-- [x] Load a custom alphabet from a text file
+- [x] Load a custom alphabet from a string
 - [x] Specify a flag format in order to filter results
 - [x] Run the script in Debug Mode
 - [ ] Multi-threading
@@ -17,7 +17,7 @@ The following features are supported
 ## Supported Alphabets
 Code | Alphabet
 ----- | ---------
-0 |  !"#$%&'()\*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^\_\`abcdefghijklmnopqrstuvwxyz{\|}~
+0 | \ !"#$%&'()\*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^\_\`abcdefghijklmnopqrstuvwxyz{\|}~
 1 | 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"#$%&'()\*+,-./:;<=>?@[\\]^\_\`{\|}~
 2 | ABCDEFGHIJKLMNOPQRSTUVWXYZ
 3 | abcdefghijklmnopqrstuvwxyz
